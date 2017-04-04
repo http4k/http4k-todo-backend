@@ -1,12 +1,14 @@
 language: java
-
 jdk:
 - oraclejdk8
-
 after_success:
-- ./gradlew cobertura coveralls
-
+- "./gradlew cobertura coveralls"
 cache:
   directories:
-  - $HOME/.m2
-  - $HOME/.gradle
+  - "$HOME/.m2"
+  - "$HOME/.gradle"
+deploy:
+  provider: heroku
+  app: reekwest-todo-backend
+  api_key:
+    secure: GEWomeJWbGG47qgOknyeI5dxywY/T4eRPV0HRRDFqlH0vvCoEGK94QkQZTINPBiZk1FIiJqwtolxdb0taHnIqdfkBXmnKw+k2h4zbV+Mg+A/FX2S9UpTj4lfA1v6GaqpuKgzsjYxPfW86BIQGy8+t8U/9VJQCc/Rn+iX4NJ1K37qgUcyjNoBXPNOeQZZ8/ua4APOB0VyrYYLKJqJhTsikByPlboqCPo6WG2Xax6A/bnO2KLLz72l5SDwhQP2i8k+qmnCpGRcI5y5/2X7Ovik4b5qzcjfNL/yOTnHwZ5lWyAniU5B182OZ06BDqp0nNOAL34AAZn+Tvid1Ggzx7GkroeqCdRXIlim+/M0EhZGhKc4D3xe/Z4bJ77Ls1g4iBF+oDiJCKgCN33nbdlzKg76awTLHMGT+YkblywSEZcwtINwZCKrg1PlohmKErT+W+gxc/wIcs0h+9rMUpb0JxmJzJwDJqi5llx3fEA4OayFIB3i9Ggez/jNgZyST3fYc4FG8x4ItyxT8Jfk672MavdWtMisJ7htqRWIb1HebLpjQSHmsHtc2OrDpKwKET7aHFO4ZZ+9h7Zkx2eXK3brrrPqaPuyOtkcXJoMUschIZoA94cvq0CyK34CPKwFGEuTd6gBsrOdSZ4I5Smt98+NUQDt8fZVfwipjUGdSutx2VGOCpg=
