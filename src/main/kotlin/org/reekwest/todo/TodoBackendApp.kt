@@ -9,6 +9,11 @@ import org.reekwest.http.routing.by
 import org.reekwest.http.routing.routes
 
 fun main(args: Array<String>) {
-    routes(Method.GET to "/" by { _: Request -> ok().entity("Hello World") }).startJettyServer(args[0].toInt())
-}
+    val port = if (args.isNotEmpty()) args[0] else "5000"
 
+    val headers = listOf("access-control-allow-origin" to "*", "access-control-allow-headers" to "content-type")
+    routes(
+        Method.OPTIONS to "/" by { _: Request -> ok(headers = headers) },
+        Method.GET to "/" by { _: Request -> ok(headers = headers).entity("Hello World") }
+    ).startJettyServer(port.toInt())
+}
