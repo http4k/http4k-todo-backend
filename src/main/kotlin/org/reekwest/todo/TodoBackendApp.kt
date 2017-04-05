@@ -3,7 +3,10 @@ package org.reekwest.todo
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.reekwest.http.core.HttpMessage
-import org.reekwest.http.core.Method
+import org.reekwest.http.core.Method.DELETE
+import org.reekwest.http.core.Method.GET
+import org.reekwest.http.core.Method.OPTIONS
+import org.reekwest.http.core.Method.POST
 import org.reekwest.http.core.Request
 import org.reekwest.http.core.entity.Entity
 import org.reekwest.http.core.entity.EntityTransformer
@@ -18,13 +21,27 @@ import java.nio.ByteBuffer
 fun main(args: Array<String>) {
     val port = if (args.isNotEmpty()) args[0] else "5000"
 
-    val headers = listOf("access-control-allow-origin" to "*", "access-control-allow-headers" to "content-type")
+    val headers = listOf(
+        "access-control-allow-origin" to "*",
+        "access-control-allow-headers" to "content-type",
+        "access-control-allow-methods" to "POST, GET, OPTIONS, PUT, DELETE")
+
+    var todos = mutableListOf<TodoEntry>()
+
     routes(
-        Method.OPTIONS to "/" by { _: Request -> ok(headers = headers) },
-        Method.GET to "/" by { _: Request -> ok(headers = headers).entity("Hello World") },
-        Method.POST to "/" by { request: Request -> ok(headers = headers, entity = request.todoEntry().toEntity()) }
+        OPTIONS to "/" by { _: Request -> ok(headers = headers) },
+        GET to "/" by { _: Request -> ok(headers = headers).entity(todos.toJson()) },
+        POST to "/" by { request: Request ->
+            val todo = request.todoEntry()
+            ok(headers = headers, entity = todo.toEntity())
+        },
+        DELETE to "/" by { _: Request ->
+            ok(headers = headers).entity(todos.toJson())
+        }
     ).startJettyServer(port.toInt())
 }
+
+fun List<TodoEntry>.toJson(): String = jacksonObjectMapper().writeValueAsString(this)
 
 data class TodoEntry(val title: String, val order: Int)
 
