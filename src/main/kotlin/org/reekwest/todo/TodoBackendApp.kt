@@ -21,24 +21,19 @@ import java.nio.ByteBuffer
 fun main(args: Array<String>) {
     val port = if (args.isNotEmpty()) args[0] else "5000"
 
-    val headers = listOf(
-        "access-control-allow-origin" to "*",
-        "access-control-allow-headers" to "content-type",
-        "access-control-allow-methods" to "POST, GET, OPTIONS, PUT, DELETE")
+    val todos = mutableListOf<TodoEntry>()
 
-    var todos = mutableListOf<TodoEntry>()
-
-    routes(
-        OPTIONS to "/" by { _: Request -> ok(headers = headers) },
-        GET to "/" by { _: Request -> ok(headers = headers).entity(todos.toJson()) },
+    cors(routes(
+        OPTIONS to "/" by { _: Request -> ok() },
+        GET to "/" by { _: Request -> ok().entity(todos.toJson()) },
         POST to "/" by { request: Request ->
             val todo = request.todoEntry()
-            ok(headers = headers, entity = todo.toEntity())
+            ok(entity = todo.toEntity())
         },
         DELETE to "/" by { _: Request ->
-            ok(headers = headers).entity(todos.toJson())
+            ok().entity(todos.toJson())
         }
-    ).startJettyServer(port.toInt())
+    )).startJettyServer(port.toInt())
 }
 
 fun List<TodoEntry>.toJson(): String = jacksonObjectMapper().writeValueAsString(this)
