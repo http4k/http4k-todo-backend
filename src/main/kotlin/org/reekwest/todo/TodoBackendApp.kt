@@ -24,12 +24,15 @@ fun main(args: Array<String>) {
 
     cors(log(routes(
         OPTIONS to "/{any:.*}" by { _: Request -> ok() },
-        GET to "/{id:.+}" by { request: Request -> todos.find(request.path("id")!!)?.let { ok().entity(it.toEntity()) } ?: notFound() },
+        GET to "/{id:.+}" by { request: Request -> todos.find(idFromPath(request))?.let { ok().entity(it.toEntity()) } ?: notFound() },
         GET to "/" by { _: Request -> ok().entity(todos.all().toJson()) },
-        POST to "/" by { request: Request -> ok().entity(todos.save(request.todoEntry()).toEntity()) },
-        PATCH to "/{id:.+}" by { _: Request -> ok() },
+        POST to "/" by { request: Request -> ok().entity(todos.save(null, request.todoEntry()).toEntity()) },
+        PATCH to "/{id:.+}" by { request: Request -> ok().entity(todos.save(idFromPath(request), request.todoEntry()).toEntity()) },
+        DELETE to "/{id:.+}" by { request: Request -> todos.delete(idFromPath(request))?.let { ok().entity(it.toEntity()) } ?: notFound() },
         DELETE to "/" by { _: Request -> ok().entity(todos.clear().toJson()) }
     ))).startJettyServer(port.toInt())
 }
 
-data class TodoEntry(val title: String, val order: Int, val url: String? = null, val completed: Boolean = false)
+private fun idFromPath(request: Request) = request.path("id")!!.replace("/", "") // <- that should not be necessary
+
+data class TodoEntry(val id: String? = null, val url: String? = null, val title: String? = null, val order: Int? = 0, val completed: Boolean? = false)
