@@ -1,1 +1,1 @@
-web: build/install/reekwest-todo-backend/bin/reekwest-todo-backend $PORT
+web: build/install/reekwest-todo-backend/bin/reekwest-todo-backend $PORT "https://reekwest-todo-backend.herokuapp.com"
