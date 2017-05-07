@@ -3,7 +3,7 @@ version '1.0-SNAPSHOT'
 
 buildscript {
     ext.kotlin_version = '1.1.1'
-    ext.reekwest_version = '0.0.10'
+    ext.reekwest_version = '0.11.0'
 
     repositories {
         mavenCentral()
@@ -29,6 +29,7 @@ repositories {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     compile "org.reekwest:reekwest:$reekwest_version"
+    compile "org.reekwest:reekwest-server-jetty:$reekwest_version"
     compile "javax.servlet:javax.servlet-api:3.1.0"
     compile "org.eclipse.jetty:jetty-http:9.3.9.v20160517"
     compile "org.eclipse.jetty:jetty-io:9.3.9.v20160517"
