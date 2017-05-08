@@ -1,4 +1,4 @@
-# reekwest-todo-backend
+# http4k-todo-backend
 
 [![build status](https://travis-ci.org/reekwest/http4k-todo-backend.svg?branch=master)](https://travis-ci.org/http4k/http4k-todo-backend.svg?branch=master)
 
