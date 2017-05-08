@@ -1,4 +1,4 @@
-package org.reekwest.todo
+package org.http4k.todo
 
 import org.reekwest.http.core.HttpHandler
 import org.reekwest.http.core.Request
