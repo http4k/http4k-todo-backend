@@ -1,6 +1,6 @@
 # http4k-todo-backend
 
-[![build status](https://travis-ci.org/reekwest/http4k-todo-backend.svg?branch=master)](https://travis-ci.org/http4k/http4k-todo-backend.svg?branch=master)
+[![build status](https://travis-ci.org/http4k/http4k-todo-backend.svg?branch=master)](https://travis-ci.org/http4k/http4k-todo-backend.svg?branch=master)
 
 Reekwest implementation of http://www.todobackend.com
 
