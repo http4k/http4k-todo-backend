@@ -1,9 +1,9 @@
-group 'org.reekwest'
+group 'org.http4k'
 version '1.0-SNAPSHOT'
 
 buildscript {
     ext.kotlin_version = '1.1.1'
-    ext.reekwest_version = '0.11.0'
+    ext.http4k_version = '0.14.0'
 
     repositories {
         mavenCentral()
@@ -22,27 +22,21 @@ sourceCompatibility = 1.8
 repositories {
     mavenCentral()
     maven {
-        url "https://dl.bintray.com/reekwest/maven"
+        url "https://dl.bintray.com/http4k/maven"
     }
 }
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
-    compile "org.reekwest:reekwest:$reekwest_version"
-    compile "org.reekwest:reekwest-server-jetty:$reekwest_version"
-    compile "javax.servlet:javax.servlet-api:3.1.0"
-    compile "org.eclipse.jetty:jetty-http:9.3.9.v20160517"
-    compile "org.eclipse.jetty:jetty-io:9.3.9.v20160517"
-    compile "org.eclipse.jetty:jetty-util:9.3.9.v20160517"
-    compile "org.eclipse.jetty:jetty-server:9.3.9.v20160517"
-    compile "org.eclipse.jetty:jetty-servlet:9.3.9.v20160517"
-    compile "org.eclipse.jetty:jetty-webapp:9.3.9.v20160517"
-    compile "org.eclipse.jetty:jetty-security:9.3.9.v20160517"
+
+    compile "org.http4k:http4k-core:$http4k_version"
+    compile "org.http4k:http4k-server-jetty:$http4k_version"
+
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.8.7"
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
-mainClassName = 'org.reekwest.todo.TodoBackendAppKt'
+mainClassName = 'org.http4k.todo.TodoBackendAppKt'
 
 task stage(dependsOn: ['installDist'])

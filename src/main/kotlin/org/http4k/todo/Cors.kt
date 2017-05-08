@@ -1,7 +1,7 @@
 package org.http4k.todo
 
-import org.reekwest.http.core.HttpHandler
-import org.reekwest.http.core.Request
+import org.http4k.core.HttpHandler
+import org.http4k.core.Request
 
 private val corsHeaders = listOf(
     "access-control-allow-origin" to "*",
