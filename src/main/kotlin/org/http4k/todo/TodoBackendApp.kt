@@ -1,7 +1,5 @@
 package org.http4k.todo
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import org.http4k.core.HttpMessage
 import org.http4k.core.Method.DELETE
 import org.http4k.core.Method.GET
@@ -9,16 +7,20 @@ import org.http4k.core.Method.OPTIONS
 import org.http4k.core.Method.PATCH
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
-import org.http4k.core.Response.Companion.notFound
-import org.http4k.core.Response.Companion.ok
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Status.Companion.OK
 import org.http4k.core.then
+import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
 import org.http4k.filter.DebuggingFilters
+import org.http4k.filter.ServerFilters.Cors
+import org.http4k.format.Jackson.asA
+import org.http4k.format.Jackson.asJsonString
 import org.http4k.routing.by
 import org.http4k.routing.path
 import org.http4k.routing.routes
-import org.http4k.server.startJettyServer
-import java.nio.ByteBuffer
-
+import org.http4k.server.Jetty
+import org.http4k.server.asServer
 
 fun main(args: Array<String>) {
     val port = if (args.isNotEmpty()) args[0] else "5000"
@@ -27,24 +29,21 @@ fun main(args: Array<String>) {
 
     DebuggingFilters
         .PrintRequestAndResponse()
-        .then(cors(routes(
-            OPTIONS to "/{any:.*}" by { _: Request -> ok() },
-            GET to "/{id:.+}" by { request: Request -> todos.find(idFromPath(request))?.let { ok().body(it.toEntity()) } ?: notFound() },
-            GET to "/" by { _: Request -> ok().body(todos.all().toJson()) },
-            POST to "/" by { request: Request -> ok().body(todos.save(null, request.todoEntry()).toEntity()) },
-            PATCH to "/{id:.+}" by { request: Request -> ok().body(todos.save(idFromPath(request), request.todoEntry()).toEntity()) },
-            DELETE to "/{id:.+}" by { request: Request -> todos.delete(idFromPath(request))?.let { ok().body(it.toEntity()) } ?: notFound() },
-            DELETE to "/" by { _: Request -> ok().body(todos.clear().toJson()) }
-        )))
-        .startJettyServer(port.toInt())
+        .then(Cors(UnsafeGlobalPermissive))
+        .then(routes(
+            OPTIONS to "/{any:.*}" by { _: Request -> Response(OK) },
+            GET to "/{id:.+}" by { request: Request -> todos.find(idFromPath(request))?.let { Response(OK).body(it.asJsonString()) } ?: Response(NOT_FOUND) },
+            GET to "/" by { _: Request -> Response(OK).body(todos.all().asJsonString()) },
+            POST to "/" by { request: Request -> Response(OK).body(todos.save(null, request.todoEntry()).asJsonString()) },
+            PATCH to "/{id:.+}" by { request: Request -> Response(OK).body(todos.save(idFromPath(request), request.todoEntry()).asJsonString()) },
+            DELETE to "/{id:.+}" by { request: Request -> todos.delete(idFromPath(request))?.let { Response(OK).body(it.asJsonString()) } ?: Response(NOT_FOUND) },
+            DELETE to "/" by { _: Request -> Response(OK).body(todos.clear().asJsonString()) }
+        ))
+        .asServer(Jetty(port.toInt())).start().block()
 }
 
 private fun idFromPath(request: Request) = request.path("id")!!.replace("/", "") // <- that should not be necessary
 
 data class TodoEntry(val id: String? = null, val url: String? = null, val title: String? = null, val order: Int? = 0, val completed: Boolean? = false)
 
-val mapper = jacksonObjectMapper()
-
-fun HttpMessage.todoEntry() = body?.let { mapper.readValue<TodoEntry>(String(it.array())) } ?: throw RuntimeException("could not get todo from entity")
-fun TodoEntry.toEntity(): ByteBuffer = ByteBuffer.wrap(mapper.writeValueAsString(this).toByteArray())
-fun List<TodoEntry>.toJson(): String = jacksonObjectMapper().writeValueAsString(this)
+fun HttpMessage.todoEntry(): TodoEntry = bodyString().asA<TodoEntry>()

@@ -2,8 +2,8 @@ group 'org.http4k'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.1.1'
-    ext.http4k_version = '0.14.0'
+    ext.kotlin_version = '1.1.2'
+    ext.http4k_version = '1.14.0'
 
     repositories {
         mavenCentral()
@@ -21,9 +21,6 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
-    maven {
-        url "https://dl.bintray.com/http4k/maven"
-    }
 }
 
 dependencies {
@@ -31,8 +28,7 @@ dependencies {
 
     compile "org.http4k:http4k-core:$http4k_version"
     compile "org.http4k:http4k-server-jetty:$http4k_version"
-
-    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.8.7"
+    compile "org.http4k:http4k-format-jackson:$http4k_version"
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
