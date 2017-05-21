@@ -14,6 +14,7 @@ import org.http4k.core.then
 import org.http4k.core.with
 import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
 import org.http4k.filter.DebuggingFilters
+import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.filter.ServerFilters.Cors
 import org.http4k.format.Jackson.asJsonString
 import org.http4k.format.Jackson.auto
@@ -36,6 +37,7 @@ fun main(args: Array<String>) {
     DebuggingFilters
         .PrintRequestAndResponse()
         .then(Cors(UnsafeGlobalPermissive))
+        .then(CatchLensFailure)
         .then(routes(
             OPTIONS to "/{any:.*}" by { _: Request -> Response(OK) },
             GET to "/{id:.+}" by { request: Request -> todos.find(idLens(request))?.let { Response(OK).with(todoLens of it) } ?: Response(NOT_FOUND) },
