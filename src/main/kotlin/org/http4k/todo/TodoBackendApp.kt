@@ -39,13 +39,13 @@ fun main(args: Array<String>) {
         .then(Cors(UnsafeGlobalPermissive))
         .then(CatchLensFailure)
         .then(routes(
-            OPTIONS to "/{any:.*}" by { _: Request -> Response(OK) },
-            GET to "/{id:.+}" by { request: Request -> todos.find(idLens(request))?.let { Response(OK).with(todoLens of it) } ?: Response(NOT_FOUND) },
-            GET to "/" by { _: Request -> Response(OK).body(todos.all().asJsonString()) },
-            POST to "/" by { request: Request -> Response(OK).with(todoLens of todos.save(null, todoLens(request))) },
-            PATCH to "/{id:.+}" by { request: Request -> Response(OK).with(todoLens of todos.save(idLens(request), todoLens(request))) },
-            DELETE to "/{id:.+}" by { request: Request -> todos.delete(idLens(request))?.let { Response(OK).with(todoLens of it) } ?: Response(NOT_FOUND) },
-            DELETE to "/" by { _: Request -> Response(OK).with(todoListLens of todos.clear()) }
+            "/{any:.*}" to OPTIONS by { _: Request -> Response(OK) },
+            "/{id:.+}" to GET by { request: Request -> todos.find(idLens(request))?.let { Response(OK).with(todoLens of it) } ?: Response(NOT_FOUND) },
+            "/" to GET by { _: Request -> Response(OK).body(todos.all().asJsonString()) },
+            "/" to POST by { request: Request -> Response(OK).with(todoLens of todos.save(null, todoLens(request))) },
+            "/{id:.+}" to PATCH by { request: Request -> Response(OK).with(todoLens of todos.save(idLens(request), todoLens(request))) },
+            "/{id:.+}" to DELETE by { request: Request -> todos.delete(idLens(request))?.let { Response(OK).with(todoLens of it) } ?: Response(NOT_FOUND) },
+            "/" to DELETE by { _: Request -> Response(OK).with(todoListLens of todos.clear()) }
         ))
         .asServer(Jetty(port.toInt())).start().block()
 }
