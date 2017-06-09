@@ -16,11 +16,10 @@ import org.http4k.filter.CorsPolicy.Companion.UnsafeGlobalPermissive
 import org.http4k.filter.DebuggingFilters
 import org.http4k.filter.ServerFilters.CatchLensFailure
 import org.http4k.filter.ServerFilters.Cors
-import org.http4k.format.Jackson.asJsonString
 import org.http4k.format.Jackson.auto
 import org.http4k.lens.Path
 import org.http4k.lens.string
-import org.http4k.routing.by
+import org.http4k.routing.bind
 import org.http4k.routing.routes
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
@@ -39,13 +38,13 @@ fun main(args: Array<String>) {
         .then(Cors(UnsafeGlobalPermissive))
         .then(CatchLensFailure)
         .then(routes(
-            "/{any:.*}" to OPTIONS by { _: Request -> Response(OK) },
-            "/{id:.+}" to GET by { request: Request -> todos.find(idLens(request))?.let { Response(OK).with(todoLens of it) } ?: Response(NOT_FOUND) },
-            "/" to GET by { _: Request -> Response(OK).body(todos.all().asJsonString()) },
-            "/" to POST by { request: Request -> Response(OK).with(todoLens of todos.save(null, todoLens(request))) },
-            "/{id:.+}" to PATCH by { request: Request -> Response(OK).with(todoLens of todos.save(idLens(request), todoLens(request))) },
-            "/{id:.+}" to DELETE by { request: Request -> todos.delete(idLens(request))?.let { Response(OK).with(todoLens of it) } ?: Response(NOT_FOUND) },
-            "/" to DELETE by { _: Request -> Response(OK).with(todoListLens of todos.clear()) }
+            "/{any:.*}" to OPTIONS bind { _: Request -> Response(OK) },
+            "/{id:.+}" to GET bind { request: Request -> todos.find(idLens(request))?.let { Response(OK).with(todoLens of it) } ?: Response(NOT_FOUND) },
+            "/" to GET bind { _: Request -> Response(OK).with(todoListLens of todos.all()) },
+            "/" to POST bind { request: Request -> Response(OK).with(todoLens of todos.save(null, todoLens(request))) },
+            "/{id:.+}" to PATCH bind { request: Request -> Response(OK).with(todoLens of todos.save(idLens(request), todoLens(request))) },
+            "/{id:.+}" to DELETE bind { request: Request -> todos.delete(idLens(request))?.let { Response(OK).with(todoLens of it) } ?: Response(NOT_FOUND) },
+            "/" to DELETE bind { _: Request -> Response(OK).with(todoListLens of todos.clear()) }
         ))
         .asServer(Jetty(port.toInt())).start().block()
 }
